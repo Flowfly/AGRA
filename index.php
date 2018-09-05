@@ -37,7 +37,7 @@
             </div>
             <div class="row" style="width:100%; padding-left: 3%; margin-bottom: 1%;">
                 <div class="col-4">
-                    <input type="file" class="form-control-file" name="picture-post[]" accept="image/png, image/jpeg, image/gif" multiple>
+                    <input type="file" class="form-control-file" name="picture-post[]" accept="image/*" multiple>
                 </div>
                 <div class="col-4">
                 </div>
