@@ -1,0 +1,69 @@
+html, body{
+    margin: 0;
+    height: 100%;
+    width:100%;
+    background-color: #E9EBEE;
+}
+
+nav{
+    width:30%;
+    height:100%;
+    float:left;
+    padding-left: 2%;
+    padding-right: 3%;
+}
+
+section
+{
+    width:70%;
+    height: 100%;
+    float:left;
+}
+
+#pp{
+    height: 15rem;
+    width:15rem;/*
+    width: 60%;*/
+}
+
+#cover{
+    width:99%;
+    height: 30%;
+    background-color: white;
+    border: 1px lightgray solid;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+}
+
+#cover img{
+    height: 100%;
+    width: 100%;
+}
+
+#form-post
+{
+    margin-top: 1%;
+    width:99%;
+    height: 20%;
+    background-color: white;
+    border: 1px lightgray solid;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+}
+
+#post{
+    margin-top: 1%;
+    width:99%;
+    min-height: 10%;
+    background-color: white;
+    border: 1px lightgray solid;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+}
+
+textarea{
+    resize: none;
+}
