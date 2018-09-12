@@ -1,52 +1,44 @@
 <?php
 
-include("class/resize-class.php");
-include_once ('dbConnection.php');
+include_once("class/resize-class.php");
+include_once("class/Post.php");
+include_once("class/Image.php");
+include_once("post-functions.php");
+include_once('class/Db.php');
 define("FILE_MAX_SIZE", 3000000);
 
+$db = new Db('Facebook', 'localhost', 'root', '', [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
 $upload_dir = "../img/uploads";
 $accepted_extensions = array("image/png", "image/jpg", "image/jpeg");
-$nbElements =  count($_FILES['picture-post']['name']);
 
 
+if (isset($_POST['text-post']) && isset($_FILES['picture-post'])) {
+    $text = filter_input(INPUT_POST, 'text-post');
+    $isFileOk = CheckImagesProperties($_FILES, $accepted_extensions);
+    if ($isFileOk) {
+        // Inserting the post in the database
+        $time = date('Y-m-d') . ' ' . date('H:i:s');
+        $post = new Post($db->GetPDO(), $text, $time, $time);
+        $last_idpost_inserted = $post->InsertPost();
+        if($last_idpost_inserted >= 0)
+        {
+            for ($i = 0; $i < count($_FILES['picture-post']['name']); $i++) {
 
-//var_dump($_FILES);
-for($i = 0; $i < $nbElements; $i++)
-{
-    $isFileOk = true;
+                $date = new DateTime();
+                $img = new Image($last_idpost_inserted . "_" . uniqid() . $date->getTimestamp() . sha1(basename($_FILES['picture-post']['name'][$i])) . "." . pathinfo($_FILES['picture-post']['name'][$i])['extension'], $last_idpost_inserted);
+                $wasImageInserted = $img->InsertImage($db->GetPDO());
 
-    //Check if the file is to the correct extension
-    if(!in_array($_FILES['picture-post']['type'][$i], $accepted_extensions))
-        $isFileOk = false;
-    //Check if the file doesn't exceed the size
-    if($_FILES['picture-post']['size'][$i] > FILE_MAX_SIZE)
-        $isFileOk = false;
-
-    //If all the image is good, this code will upload it on the "uploads" dir
-    if($isFileOk) {
-        $tmp_name = $_FILES['picture-post']['tmp_name'][$i];
-        $query = $bdd->prepare("SELECT MAX(idPost) as idMax FROM post");
-        $query->execute();
-        $idmax = $query->fetchAll(PDO::FETCH_ASSOC);
-        if($idmax[0]['idMax'] == null)
-            $idmax = 1;
-        else
-            $idmax = $idmax[0]['idMax']+1;
-        $date = new DateTime();
-        $name = $idmax . "_" . uniqid() . $date->getTimestamp() . sha1(basename($_FILES['picture-post']['name'][$i])) . "." . pathinfo($_FILES['picture-post']['name'][$i])['extension'];
-        move_uploaded_file($tmp_name, "$upload_dir/$name");
-        $imgresized = new resize("$upload_dir/$name");
-        $imgresized->resizeImage(1024, 768, 'crop');
-        $imgresized->saveImage("$upload_dir/$name", 9);
+                if ($wasImageInserted) {
+                    //If all the image are good, this code will upload them on the "uploads" dir
+                    $tmp_name = $_FILES['picture-post']['tmp_name'][$i];
+                    $name = $img->getName();
+                    move_uploaded_file($tmp_name, "$upload_dir/$name");
+                    $imgresized = new resize("$upload_dir/$name");
+                    $imgresized->resizeImage(1024, 768, 'exact');
+                    $imgresized->saveImage("$upload_dir/$name", 9);
+                }
+            }
+        }
     }
 }
-/*
-echo "<br>";
-$fullpath = "C:\laragon\www\AGRA\img\\" . $_FILES['picture-post']['name'][0];
-echo $fullpath . "<br>";
-echo $_SERVER['SERVER_NAME'] . "\AGRA\img\\";*/
-/*$imgresized = new resize($fullpath);
-$imgresized->resizeImage(1024, 768, 'auto');
-$imgresized->saveImage('test.png', 9);
-*/
 ?>
