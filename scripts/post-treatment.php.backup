@@ -1,98 +1,45 @@
 <?php
 
-include("class/resize-class.php");
-include_once('dbConnection.php');
+include_once("class/resize-class.php");
+include_once("class/Post.php");
+include_once("class/PostController.php");
+include_once("class/Image.php");
+include_once("post-functions.php");
+include_once('class/Db.php');
 define("FILE_MAX_SIZE", 3000000);
 
+$db = new Db('Facebook', 'localhost', 'root', '', [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
 $upload_dir = "../img/uploads";
 $accepted_extensions = array("image/png", "image/jpg", "image/jpeg");
-$nbElements = count($_FILES['picture-post']['name']);
 
 
 if (isset($_POST['text-post']) && isset($_FILES['picture-post'])) {
     $text = filter_input(INPUT_POST, 'text-post');
-    $finfo = finfo_open(FILEINFO_MIME);
-    for ($i = 0; $i < $nbElements; $i++) {
-        $isFileOk = true;
-        $mime = finfo_file($finfo, $_FILES['picture-post']['tmp_name'][$i]);
-        $extension = explode(';', $mime);
-
-        //Check if the file is to the correct extension
-        if (!in_array($_FILES['picture-post']['type'][$i], $accepted_extensions) || !in_array($extension[0], $accepted_extensions)) {
-            $isFileOk = false;
-            break;
-        }
-        //Check if the file doesn't exceed the size
-        if ($_FILES['picture-post']['size'][$i] > FILE_MAX_SIZE) {
-            $isFileOk = false;
-            break;
-        }
-    }
-    finfo_close($finfo);
+    $isFileOk = CheckImagesProperties($_FILES, $accepted_extensions);
     if ($isFileOk) {
         // Inserting the post in the database
-        try{
-            $bdd->beginTransaction();
-            $query = $bdd->prepare("INSERT INTO post (textPost, datePost, dateLastUpdate) VALUES (:text, :dateInsert, :dateLastUpdate)");
-            $query->bindValue(":text", $text, PDO::PARAM_STR);
-            $time = date('Y-m-d') . ' ' . date('H:i:s');
-            $query->bindValue(":dateInsert", $time, PDO::PARAM_STR);
-            $query->bindValue(":dateLastUpdate", $time, PDO::PARAM_STR);
-            $wasPostInserted = $query->execute();
-            $last_idpost_inserted = $bdd->lastInsertId();
-            if($wasPostInserted)
-            {
-                for ($i = 0; $i < $nbElements; $i++) {
+        $time = date('Y-m-d') . ' ' . date('H:i:s');
+        $post = new PostController($db->GetPDO());
+        //$last_idpost_inserted = $post->InsertPost(new Post($db->GetPDO(), $text, $time, $time));
+        if($last_idpost_inserted >= 0)
+        {
+            for ($i = 0; $i < count($_FILES['picture-post']['name']); $i++) {
+
+                $date = new DateTime();
+                $img = new Image($last_idpost_inserted . "_" . uniqid() . $date->getTimestamp() . sha1(basename($_FILES['picture-post']['name'][$i])) . "." . pathinfo($_FILES['picture-post']['name'][$i])['extension']);
+                $wasImageInserted = $img->InsertImage($db->GetPDO());
+
+                if ($wasImageInserted) {
                     //If all the image are good, this code will upload them on the "uploads" dir
                     $tmp_name = $_FILES['picture-post']['tmp_name'][$i];
-                    $date = new DateTime();
-                    $name = $last_idpost_inserted . "_" . uniqid() . $date->getTimestamp() . sha1(basename($_FILES['picture-post']['name'][$i])) . "." . pathinfo($_FILES['picture-post']['name'][$i])['extension'];
-                    $query_image = $bdd->prepare("INSERT INTO image (nameImage, idPost) VALUES (:nameImage, :idPost)");
-                    $query_image->bindValue(":nameImage", $name, PDO::PARAM_STR);
-                    $query_image->bindValue(":idPost", $last_idpost_inserted, PDO::PARAM_INT);
-                    $wasImageInserted = $query_image->execute();
-                    if($wasImageInserted)
-                    {
-                        move_uploaded_file($tmp_name, "$upload_dir/$name");
-                        $imgresized = new resize("$upload_dir/$name");
-                        $imgresized->resizeImage(1024, 768, 'exact');
-                        $imgresized->saveImage("$upload_dir/$name", 9);
-                    }
-                    else
-                        throw new Exception("Image non insérée", 2);
+                    $name = $img->getName();
+                    move_uploaded_file($tmp_name, "$upload_dir/$name");
+                    $imgresized = new resize("$upload_dir/$name");
+                    $imgresized->resizeImage(1024, 768, 'exact');
+                    $imgresized->saveImage("$upload_dir/$name", 9);
                 }
             }
-            else
-                throw new Exception("Post non inséré", 1);
-
-            $bdd->commit();
-        }catch(Exception $e)
-        {
-            $bdd->rollBack();
-            echo $e->getMessage();
         }
-
     }
 }
-
-
-
-    //var_dump($finfo);
-    // Filter the post variable
-
-
-
-    /*
-    }*/
-
-
-/*
-echo "<br>";
-$fullpath = "C:\laragon\www\AGRA\img\\" . $_FILES['picture-post']['name'][0];
-echo $fullpath . "<br>";
-echo $_SERVER['SERVER_NAME'] . "\AGRA\img\\";*/
-/*$imgresized = new resize($fullpath);
-$imgresized->resizeImage(1024, 768, 'auto');
-$imgresized->saveImage('test.png', 9);
-*/
 ?>

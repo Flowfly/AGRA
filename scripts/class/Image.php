@@ -28,29 +28,12 @@ class Image
     }
 
     //Constructors
-    public function __construct($name, $idPost)
+    public function __construct($name, $idPost = 0)
     {
         $this->setName($name);
-        $this->setIdPost($idPost);
+        $this->setIdPost(0);
     }
 
     //Methods
-    public function InsertImage(PDO $db)
-    {
-        try{
-            $db->beginTransaction();
-            $query_image = $db->prepare("INSERT INTO image (nameImage, idPost) VALUES (:nameImage, :idPost)");
-            $query_image->bindValue(":nameImage", $this->name, PDO::PARAM_STR);
-            $query_image->bindValue(":idPost", $this->idPost, PDO::PARAM_INT);
-            $result = $query_image->execute();
-            $db->commit();
-            return $result;
-        }catch(Exception $e)
-        {
-            echo $e->getMessage();
-            $db->rollBack();
-            return false;
-        }
 
-    }
 }

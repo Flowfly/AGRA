@@ -8,20 +8,23 @@
 
 class Post
 {
-    private $db;
+    private $id;
+
+
     private $text;
     private $date;
     private $dateLastUpdate;
-    private $images;
+    private $images = array();
 
-    public function getDb()
+
+    public function getId()
     {
-        return $this->db;
+        return $this->id;
     }
 
-    public function setDb($db)
+    public function setId($id)
     {
-        $this->db = $db;
+        $this->id = $id;
     }
 
     public function getText()
@@ -64,44 +67,14 @@ class Post
         $this->images = $images;
     }
 
-    public function __construct(PDO $db, $text, $date, $dateLastUpdate)
+    public function __construct($text, $date, $dateLastUpdate, array $img)
     {
-        $this->setDb($db);
         $this->setText($text);
         $this->setDate($date);
         $this->setDateLastUpdate($dateLastUpdate);
+        $this->setImages($img);
+
     }
 
     //Methods
-    public function InsertPost()
-    {
-        try {
-            $this->getDb()->beginTransaction();
-            $query = $this->getDb()->prepare("INSERT INTO post (textPost, datePost, dateLastUpdate) VALUES (:text, :dateInsert, :dateLastUpdate)");
-            $query->bindValue(":text", $this->getText(), PDO::PARAM_STR);
-            $query->bindValue(":dateInsert", $this->getDate(), PDO::PARAM_STR);
-            $query->bindValue(":dateLastUpdate", $this->getDateLastUpdate(), PDO::PARAM_STR);
-            $query->execute();
-            $lastId = $this->getDb()->lastInsertId();
-            $this->getDb()->commit();
-            return $lastId;
-        } catch (Exception $e) {
-            $this->getDb()->rollBack();
-            echo $e->getMessage();
-            return -1;
-        }
-    }
-
-    private function FillImagesVar()
-    {
-        try{
-            $this->getDb()->beginTransaction();
-            $query = $this->getDb()->prepare("SELECT nameImage FROM image, post WHERE image.idPost = post.idPost AND image.idPost = :idpost");
-            $query->bindValue(":idpost", $this->get);
-
-        }catch(Exception $e)
-        {
-            $e->getMessage();
-        }
-    }
 }

@@ -111,6 +111,7 @@ class Db
             try{
                 $dsn = 'mysql:host=' . $this->getHost() . ';dbname=' . $this->getDbname();
                 self::$dbinstance = new PDO($dsn, $this->getUser(), $this->getPassword(), $this->getOptions());
+
             }catch (PDOException $e)
             {
                 echo $e->getMessage();

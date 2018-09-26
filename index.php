@@ -1,3 +1,11 @@
+<?php
+session_start();
+include_once("scripts/class/Post.php");
+include_once("scripts/class/PostController.php");
+include_once("scripts/class/Image.php");
+include_once('scripts/class/Db.php');
+?>
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -47,12 +55,58 @@
             </div>
         </div>
     </form>
-    <div class="row" id="post">
+    <?php
+        $db = new Db('Facebook', 'localhost', 'root', '', [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
+        $controller = new PostController($db->GetPDO());
+        foreach($controller->SelectAllPosts() as $item)
+        {
+            ?>
+            <div class="post">
+                <div class="row">
+                    <div class="col-12">
+                        <p><span><?=$item->getText(); ?></span></p>
+                    </div>
+                </div>
+                <?php
+                for($i = 0; $i < count($item->getImages()); $i++)
+                {
+                    ?>
+                    <div class="row">
+                        <div class="col-12">
+                            <img src="img/uploads/<?=$item->getImages()[$i]->getName() ?>">
+                        </div>
+                    </div>
+                <?php
+                }
+                ?>
+            </div>
+    <?php
+        }
+    ?>
+<div class="post">
+    <div class="row">
         <div class="col-12">
-            <p><span>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Corporis ipsum, mollitia. Ad, aperiam doloremque earum et excepturi facilis, ipsa minima nesciunt nobis pariatur porro quo rerum sint ullam ut voluptate!</span><span>Adipisci aperiam at autem consectetur consequuntur culpa cumque dolore dolorum eum ex explicabo fugit harum iusto modi molestiae natus neque nihil possimus praesentium, provident quibusdam quo soluta suscipit tenetur ullam.</span><span>Accusantium commodi consequuntur dolore, doloremque expedita id illum laborum nam natus, nihil nisi porro quo ratione sint sunt! Ad beatae debitis doloribus esse itaque minus perferendis quam tenetur vel veniam?</span><span>Ducimus eius, ex incidunt nesciunt odit quam repellendus ullam. Blanditiis eius error, ipsam iusto nisi, non obcaecati optio qui ratione sapiente sint voluptas! Aliquam, nulla, odit? Dignissimos eveniet expedita minus!</span><span>Beatae dolores ea in laborum quia. Cum cupiditate eum non porro reiciendis ullam voluptatibus. Accusantium consectetur explicabo odit totam. A asperiores commodi eos iste itaque nulla quisquam! Iusto, perspiciatis, quisquam!</span>
+            <p>
+                <span>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Corporis ipsum, mollitia. Ad, aperiam doloremque earum et excepturi facilis, ipsa minima nesciunt nobis pariatur porro quo rerum sint ullam ut voluptate!</span>
+                <span>Adipisci aperiam at autem consectetur consequuntur culpa cumque dolore dolorum eum ex explicabo fugit harum iusto modi molestiae natus neque nihil possimus praesentium, provident quibusdam quo soluta suscipit tenetur ullam.</span>
+                <span>Accusantium commodi consequuntur dolore, doloremque expedita id illum laborum nam natus, nihil nisi porro quo ratione sint sunt! Ad beatae debitis doloribus esse itaque minus perferendis quam tenetur vel veniam?</span>
+                <span>Ducimus eius, ex incidunt nesciunt odit quam repellendus ullam. Blanditiis eius error, ipsam iusto nisi, non obcaecati optio qui ratione sapiente sint voluptas! Aliquam, nulla, odit? Dignissimos eveniet expedita minus!</span>
+                <span>Beatae dolores ea in laborum quia. Cum cupiditate eum non porro reiciendis ullam voluptatibus. Accusantium consectetur explicabo odit totam. A asperiores commodi eos iste itaque nulla quisquam! Iusto, perspiciatis, quisquam!</span>
             </p>
         </div>
     </div>
+    <div class="row">
+        <div class="col-12">
+            <img src="img/code.png" class="img-post">
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <img src="img/code.png" class="img-post">
+        </div>
+    </div>
+</div>
+
 </section>
 <div class="modal fade" id="myModal" role="dialog">
     <div class="modal-dialog">
