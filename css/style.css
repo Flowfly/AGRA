@@ -69,6 +69,14 @@ section
     padding: 1% 2% 1% 2%;
 }
 
+#modify{
+    color:blue;
+}
+
+#delete{
+    color:red;
+}
+
 .img-post{
     width:100%;
 }

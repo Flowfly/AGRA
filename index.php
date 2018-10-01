@@ -13,6 +13,8 @@ include_once('scripts/class/Db.php');
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
           integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
     <link rel="stylesheet" href="css/style.css" type="text/css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css"
+          integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
     <title>Facebook du CFPT</title>
 </head>
 <body>
@@ -56,56 +58,101 @@ include_once('scripts/class/Db.php');
         </div>
     </form>
     <?php
-        $db = new Db('Facebook', 'localhost', 'root', '', [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
-        $controller = new PostController($db->GetPDO());
-        foreach($controller->SelectAllPosts() as $item)
-        {
-            ?>
-            <div class="post">
+    $db = new Db('Facebook', 'localhost', 'root', '', [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
+    $controller = new PostController($db->GetPDO());
+    $count = 0;
+    foreach ($controller->SelectAllPosts() as $item) {
+        $count++;
+        ?>
+        <div class="post">
+            <div class="row">
+                <div class="col-10">
+                    <p><span><?= $item->getText(); ?></span></p>
+                </div>
+                <div class="col-2" style="text-align: right; padding-right:3%; padding-top: 1%;">
+                    <a class="fas fa-pen" id="modify" onclick="EditPost(<?=$count?>)"></a>
+                    <a class="fas fa-trash" id="delete" href="#"></a>
+                </div>
+            </div>
+            <?php
+            for ($i = 0; $i < count($item->getImages()); $i++) {
+                ?>
                 <div class="row">
                     <div class="col-12">
-                        <p><span><?=$item->getText(); ?></span></p>
+                        <img src="img/uploads/<?= $item->getImages()[$i]->getName() ?>">
                     </div>
                 </div>
                 <?php
-                for($i = 0; $i < count($item->getImages()); $i++)
-                {
-                    ?>
-                    <div class="row">
-                        <div class="col-12">
-                            <img src="img/uploads/<?=$item->getImages()[$i]->getName() ?>">
+            }
+            ?>
+            <div class="modal fade" id="modal<?=$count?>" role="dialog">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title">Modification</h4>
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <textarea class="form-control" rows="4"><?=$item->getText(); ?></textarea>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Fermer</button>
+                            <button type="button" class="btn btn-primary" data-dismiss="modal">Sauvegarder</button>
                         </div>
                     </div>
-                <?php
-                }
-                ?>
+
+                </div>
             </div>
-    <?php
-        }
+        </div>
+        <?php
+    }
     ?>
-<div class="post">
-    <div class="row">
-        <div class="col-12">
-            <p>
-                <span>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Corporis ipsum, mollitia. Ad, aperiam doloremque earum et excepturi facilis, ipsa minima nesciunt nobis pariatur porro quo rerum sint ullam ut voluptate!</span>
-                <span>Adipisci aperiam at autem consectetur consequuntur culpa cumque dolore dolorum eum ex explicabo fugit harum iusto modi molestiae natus neque nihil possimus praesentium, provident quibusdam quo soluta suscipit tenetur ullam.</span>
-                <span>Accusantium commodi consequuntur dolore, doloremque expedita id illum laborum nam natus, nihil nisi porro quo ratione sint sunt! Ad beatae debitis doloribus esse itaque minus perferendis quam tenetur vel veniam?</span>
-                <span>Ducimus eius, ex incidunt nesciunt odit quam repellendus ullam. Blanditiis eius error, ipsam iusto nisi, non obcaecati optio qui ratione sapiente sint voluptas! Aliquam, nulla, odit? Dignissimos eveniet expedita minus!</span>
-                <span>Beatae dolores ea in laborum quia. Cum cupiditate eum non porro reiciendis ullam voluptatibus. Accusantium consectetur explicabo odit totam. A asperiores commodi eos iste itaque nulla quisquam! Iusto, perspiciatis, quisquam!</span>
-            </p>
+    <div class="post">
+        <div class="row">
+            <div class="col-10">
+                <p>
+                    <span>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Corporis ipsum, mollitia. Ad, aperiam doloremque earum et excepturi facilis, ipsa minima nesciunt nobis pariatur porro quo rerum sint ullam ut voluptate!</span>
+                    <span>Adipisci aperiam at autem consectetur consequuntur culpa cumque dolore dolorum eum ex explicabo fugit harum iusto modi molestiae natus neque nihil possimus praesentium, provident quibusdam quo soluta suscipit tenetur ullam.</span>
+                    <span>Accusantium commodi consequuntur dolore, doloremque expedita id illum laborum nam natus, nihil nisi porro quo ratione sint sunt! Ad beatae debitis doloribus esse itaque minus perferendis quam tenetur vel veniam?</span>
+                    <span>Ducimus eius, ex incidunt nesciunt odit quam repellendus ullam. Blanditiis eius error, ipsam iusto nisi, non obcaecati optio qui ratione sapiente sint voluptas! Aliquam, nulla, odit? Dignissimos eveniet expedita minus!</span>
+                    <span>Beatae dolores ea in laborum quia. Cum cupiditate eum non porro reiciendis ullam voluptatibus. Accusantium consectetur explicabo odit totam. A asperiores commodi eos iste itaque nulla quisquam! Iusto, perspiciatis, quisquam!</span>
+                </p>
+            </div>
+            <div class="col-2" style="text-align: right; padding-right:3%; padding-top: 1%;">
+                <a class="fas fa-pen" id="modify" href="#"></a>
+                <a class="fas fa-trash" id="delete" href="#"></a>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <img src="img/code.png" class="img-post">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <img src="img/code.png" class="img-post">
+            </div>
         </div>
     </div>
-    <div class="row">
-        <div class="col-12">
-            <img src="img/code.png" class="img-post">
+    <div class="modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Modification</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>Modal body text goes here.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary">Sauvegarder</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+                </div>
+            </div>
         </div>
     </div>
-    <div class="row">
-        <div class="col-12">
-            <img src="img/code.png" class="img-post">
-        </div>
-    </div>
-</div>
 
 </section>
 <div class="modal fade" id="myModal" role="dialog">
@@ -136,4 +183,10 @@ include_once('scripts/class/Db.php');
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"
         integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
         crossorigin="anonymous"></script>
+<script>
+    function EditPost(param)
+    {
+        $("#modal" + param).modal('show');
+    }
+</script>
 </html>
