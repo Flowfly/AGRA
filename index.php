@@ -70,8 +70,8 @@ include_once('scripts/class/Db.php');
                     <p><span><?= $item->getText(); ?></span></p>
                 </div>
                 <div class="col-2" style="text-align: right; padding-right:3%; padding-top: 1%;">
-                    <a class="fas fa-pen" id="modify" onclick="EditPost(<?=$count?>)"></a>
-                    <a class="fas fa-trash" id="delete" href="#"></a>
+                    <a class="fas fa-pen" id="modify" onclick="EditPost(<?= $item->getId() ?>)"></a>
+                    <a class="fas fa-trash" id="delete" onclick="DeletePost(<?= $item->getId() ?>)"></a>
                 </div>
             </div>
             <?php
@@ -79,30 +79,51 @@ include_once('scripts/class/Db.php');
                 ?>
                 <div class="row">
                     <div class="col-12">
-                        <img src="img/uploads/<?= $item->getImages()[$i]->getName() ?>">
+                        <img src="img/uploads/<?= $item->getImages()[$i]->getName() ?>" class="img-post">
                     </div>
                 </div>
                 <?php
             }
             ?>
-            <div class="modal fade" id="modal<?=$count?>" role="dialog">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h4 class="modal-title">Modification</h4>
-                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            <form method="post" action="scripts/post-treatment.php" id="modal-form">
+                <div class="modal fade" id="modal<?= $item->getId() ?>" role="dialog">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h4 class="modal-title<?= $item->getId() ?>">Modification</h4>
+                                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            </div>
+                            <div class="modal-body">
+                                <input type="hidden" name="idpost-delete" id="idpost-delete"
+                                       value="<?= $item->getId() ?>">
+                                <div id="edit-modal-body<?= $item->getId() ?>">
+                                    <textarea class="form-control" rows="4"
+                                              name="text-post-update"><?= $item->getText(); ?></textarea>
+                                    <input type="file" class="form-control-file" name="picture-post-update[]"
+                                           accept="image/*" multiple>
+                                </div>
+                                <div id="delete-modal-body<?= $item->getId() ?>">
+                                    <p>Voulez-vous vraiment supprimer ce post ?</p>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <div id="edit-modal-footer<?= $item->getId() ?>">
+                                    <button type="button" class="btn btn-default" data-dismiss="modal">Fermer</button>
+                                    <button type="submit" class="btn btn-primary" data-dismiss="modal"
+                                            name="post-submit-edit">Sauvegarder
+                                    </button>
+                                </div>
+                                <div id="delete-modal-footer<?= $item->getId() ?>">
+                                    <button type="button" class="btn btn-default" data-dismiss="modal">Annuler</button>
+                                    <input type="submit" class="btn btn-danger" data-dismiss="modal"
+                                           name="post-submit-delete" value="Supprimer" onclick="SubmitModalForm()">
+                                </div>
+                            </div>
                         </div>
-                        <div class="modal-body">
-                            <textarea class="form-control" rows="4"><?=$item->getText(); ?></textarea>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-default" data-dismiss="modal">Fermer</button>
-                            <button type="button" class="btn btn-primary" data-dismiss="modal">Sauvegarder</button>
-                        </div>
-                    </div>
 
+                    </div>
                 </div>
-            </div>
+            </form>
         </div>
         <?php
     }
@@ -148,7 +169,7 @@ include_once('scripts/class/Db.php');
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-primary">Sauvegarder</button>
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+                    <button type="submit" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
                 </div>
             </div>
         </div>
@@ -174,9 +195,7 @@ include_once('scripts/class/Db.php');
 </div>
 </body>
 
-<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
-        crossorigin="anonymous"></script>
+<script src="js/jquery-3.3.1.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
         integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
         crossorigin="anonymous"></script>
@@ -184,9 +203,33 @@ include_once('scripts/class/Db.php');
         integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
         crossorigin="anonymous"></script>
 <script>
-    function EditPost(param)
-    {
+    function EditPost(param) {
+        $(".modal-title" + param).text("Modification");
+        $("#edit-modal-body" + param).show();
+        $("#edit-modal-footer" + param).show();
+        $("#delete-modal-body" + param).hide();
+        $("#delete-modal-footer" + param).hide();
         $("#modal" + param).modal('show');
+    }
+
+    function DeletePost(param) {
+        $(".modal-title" + param).text("Suppression");
+        $("#edit-modal-body" + param).hide();
+        $("#edit-modal-footer" + param).hide();
+        $("#delete-modal-body" + param).show();
+        $("#delete-modal-footer" + param).show();
+        $("#modal" + param).modal('show');
+    }
+
+    function SubmitModalForm() {
+        $.ajax({
+            type: "POST",
+            url: "scripts/post-treatment.php",
+            data: {'idpost': $("#idpost-delete").val(), 'modal-delete-submit': true},
+            success: function (data) {
+                window.location.reload();
+            }
+        });
     }
 </script>
 </html>

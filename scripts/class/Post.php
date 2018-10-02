@@ -67,8 +67,9 @@ class Post
         $this->images = $images;
     }
 
-    public function __construct($text, $date, $dateLastUpdate, array $img)
+    public function __construct($idPost,$text, $date, $dateLastUpdate, array $img)
     {
+        $idPost == 0 ? $this->setId(null) : $this->setId($idPost);
         $this->setText($text);
         $this->setDate($date);
         $this->setDateLastUpdate($dateLastUpdate);

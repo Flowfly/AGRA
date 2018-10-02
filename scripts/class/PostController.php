@@ -105,12 +105,31 @@ class PostController
             $query_post->execute();
             while($result = $query_post->fetch(PDO::FETCH_ASSOC))
             {
-                array_push($post_list, new Post($result['textPost'], $result['datePost'], $result['dateLastUpdate'], $img_list));
+                array_push($post_list, new Post($idpost_list[$i], $result['textPost'], $result['datePost'], $result['dateLastUpdate'], $img_list));
             }
             $img_list = array();
         }
 
         return $post_list;
 
+    }
+
+    public function SelectOnePost($id)
+    {
+        $img_list = array();
+
+        $query = $this->db->prepare("SELECT nameImage FROM image WHERE idPost = :id");
+        $query->bindValue(":id", $id, PDO::PARAM_INT);
+        $query->execute();
+        while($result = $query->fetch(PDO::FETCH_ASSOC))
+        {
+            array_push($img_list, new Image($result['nameImage'], $id));
+        }
+
+        $query = $this->db->prepare("SELECT * FROM post WHERE idPost = :id");
+        $query->bindValue(":id", $id, PDO::PARAM_INT);
+        $query->execute();
+        $result = $query->fetchAll(PDO::FETCH_ASSOC);
+         return empty($result) ?  null : new Post($id, $result[0]['textPost'], $result[0]['datePost'], $result[0]['dateLastUpdate'], $img_list);
     }
 }

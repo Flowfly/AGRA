@@ -69,16 +69,17 @@ section
     padding: 1% 2% 1% 2%;
 }
 
+
 #modify{
-    color:blue;
+    color:#4a86e8;
 }
 
 #delete{
-    color:red;
+    color:#f24646;
 }
 
 .img-post{
-    width:100%;
+    width:75%;
 }
 textarea{
     resize: none;
