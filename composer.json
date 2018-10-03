@@ -1,0 +1,14 @@
+{
+    "name": "florian/agra",
+    "description": "AGRA Workshop Project",
+    "type": "project",
+    "require": {
+        "gumlet/php-image-resize": "^1.9"
+    },
+    "authors": [
+        {
+            "name": "Flowfly",
+            "email": "mudespacher.florian@gmail.com"
+        }
+    ]
+}

@@ -15,6 +15,7 @@ include_once('scripts/class/Db.php');
     <link rel="stylesheet" href="css/style.css" type="text/css">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css"
           integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
+    <link rel="icon" href="img/favicon.png"/>
     <title>Facebook du CFPT</title>
 </head>
 <body>
@@ -33,7 +34,7 @@ include_once('scripts/class/Db.php');
 <section>
     <div id="cover" class="row">
         <div class="col-12" style="padding:0;">
-            <img src="img/code.png" alt="code">
+            <img src="img/cfpt-banner.png" alt="code">
         </div>
     </div>
 
@@ -58,7 +59,7 @@ include_once('scripts/class/Db.php');
         </div>
     </form>
     <?php
-    $db = new Db('Facebook', 'localhost', 'root', '', [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
+    $db = new Db('Facebook', 'localhost', 'florian', '6B8X7BzRfLUFyOrF', [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
     $controller = new PostController($db->GetPDO());
     $count = 0;
     foreach ($controller->SelectAllPosts() as $item) {
@@ -95,11 +96,25 @@ include_once('scripts/class/Db.php');
                                 <button type="button" class="close" data-dismiss="modal">&times;</button>
                             </div>
                             <div class="modal-body">
-                                <input type="hidden" name="idpost-delete" id="idpost-delete"
-                                       value="<?= $item->getId() ?>">
                                 <div id="edit-modal-body<?= $item->getId() ?>">
                                     <textarea class="form-control" rows="4"
                                               name="text-post-update"><?= $item->getText(); ?></textarea>
+                                    <br>
+                                    <div class="row">
+                                        <?php
+                                        for ($i = 0; $i < count($item->getImages()); $i++) {
+                                            ?>
+                                            <div class="col-2">
+                                                <input type="checkbox" name="chbx<?=$i?>"
+                                                       value="<?= $item->getImages()[$i]->getName() ?>" checked> <img
+                                                        src="img/uploads/<?= $item->getImages()[$i]->getName() ?>"
+                                                        width="30px" height="30px">
+                                            </div>
+                                            <?php
+                                        }
+                                        ?>
+                                    </div>
+                                    <br>
                                     <input type="file" class="form-control-file" name="picture-post-update[]"
                                            accept="image/*" multiple>
                                 </div>
@@ -111,13 +126,13 @@ include_once('scripts/class/Db.php');
                                 <div id="edit-modal-footer<?= $item->getId() ?>">
                                     <button type="button" class="btn btn-default" data-dismiss="modal">Fermer</button>
                                     <button type="submit" class="btn btn-primary" data-dismiss="modal"
-                                            name="post-submit-edit">Sauvegarder
+                                            name="post-submit-edit" onclick="SubmitModalForm(0)">Sauvegarder
                                     </button>
                                 </div>
                                 <div id="delete-modal-footer<?= $item->getId() ?>">
                                     <button type="button" class="btn btn-default" data-dismiss="modal">Annuler</button>
                                     <input type="submit" class="btn btn-danger" data-dismiss="modal"
-                                           name="post-submit-delete" value="Supprimer" onclick="SubmitModalForm()">
+                                           name="post-submit-delete" value="Supprimer" onclick="SubmitModalForm(1,<?=$item->getId()?>)">
                                 </div>
                             </div>
                         </div>
@@ -222,15 +237,31 @@ include_once('scripts/class/Db.php');
         $("#modal" + param).modal('show');
     }
 
-    function SubmitModalForm() {
-        $.ajax({
-            type: "POST",
-            url: "scripts/post-treatment.php",
-            data: {'idpost': $("#idpost-delete").val(), 'modal-delete-submit': true},
-            success: (data) =>  {
-                window.location.reload();
-            }
-        });
+    function SubmitModalForm(param, id) {
+        //If the method is called to edit the post
+        if (param == 0) {
+            $.ajax({
+                type: "POST",
+                url: "scripts/post-treatment.php",
+                data: {'idpost': id, 'modal-delete-submit': true},
+                success: (data) => {
+                    window.location.reload();
+                }
+            });
+        }
+        //Else if the method is called to delete the post
+        else if (param == 1) {
+            $.ajax({
+                type: "POST",
+                url: "scripts/post-treatment.php",
+                data: {'idpost': id, 'modal-delete-submit': true},
+                success: (data) => {
+                    window.location.reload();
+                }
+            });
+        }
+
+
     }
 </script>
 </html>

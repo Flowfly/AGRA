@@ -6,9 +6,13 @@ include_once("class/PostController.php");
 include_once("class/Image.php");
 include_once("post-functions.php");
 include_once('class/Db.php');
-define("FILE_MAX_SIZE", 3000000);
+require_once('../vendor/autoload.php');
 
-$db = new Db('Facebook', 'localhost', 'root', '', [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
+define("FILE_MAX_SIZE", 3000000);
+define("IMAGE_WIDTH", 1024);
+define("IMAGE_HEIGHT", 768);
+
+$db = new Db('Facebook', 'localhost', 'florian', '6B8X7BzRfLUFyOrF', [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
 $upload_dir = "../img/uploads";
 $accepted_extensions = array("image/png", "image/jpg", "image/jpeg");
 
@@ -45,9 +49,9 @@ if (isset($_POST['text-post']) && isset($_FILES['picture-post'])) {
                 $wasImageUploaded = move_uploaded_file($tmp_name, "$upload_dir/$name");
 
                 if ($wasImageUploaded) {
-                    $imgresized = new resize("$upload_dir/$name");
-                    $imgresized->resizeImage(1024, 768, 'exact');
-                    $imgresized->saveImage("$upload_dir/$name", 9);
+                    $image = new \Gumlet\ImageResize("$upload_dir/$name");
+                    $image->resizeToBestFit(IMAGE_WIDTH, IMAGE_HEIGHT, false);
+                    $image->save("$upload_dir/$name");
                 } else {
                     $post->Delete($wasInsertSuccessfull);
                     break;
@@ -63,9 +67,6 @@ if (isset($_POST['text-post']) && isset($_FILES['picture-post'])) {
         echo "non";
 }
 
-if (isset($_POST['text-post-update']) && isset($_FILES['picture-post-update'])) {
-
-}
 // Code about the delete treatment
 // This code is called by Ajax on the index view
 if (isset($_POST['idpost']) && isset($_POST['modal-delete-submit'])) {
@@ -135,5 +136,11 @@ if (isset($_POST['idpost']) && isset($_POST['modal-delete-submit'])) {
 
         }
     }
+}
+
+// Code about the update treatment
+// This code is called by Ajax on the index view
+if (isset($_POST['text-post-update']) && isset($_FILES['picture-post-update'])) {
+
 }
 ?>
