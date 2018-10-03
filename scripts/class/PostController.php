@@ -54,7 +54,7 @@ class PostController
                 }
             }
             $this->db->commit();
-            return $last_idpost_inserted;
+            return (int)$last_idpost_inserted;
         } catch (Exception $e) {
             $this->db->rollback();
             return -1;

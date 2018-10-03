@@ -1,2 +1,7 @@
 
 .idea/workspace.xml
+img/uploads/*.jpg
+img/uploads/*.jpeg
+img/uploads/*.png
+img/uploads/*.gif
+img/uploads/*.bmp

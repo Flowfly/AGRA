@@ -13,6 +13,7 @@ $upload_dir = "../img/uploads";
 $accepted_extensions = array("image/png", "image/jpg", "image/jpeg");
 
 //Code about the insert treatment
+
 if (isset($_POST['text-post']) && isset($_FILES['picture-post'])) {
 
     //Filtering the post var
@@ -31,7 +32,11 @@ if (isset($_POST['text-post']) && isset($_FILES['picture-post'])) {
             $img = new Image(uniqid() . $date->getTimestamp() . sha1(basename($_FILES['picture-post']['name'][$i])) . "." . pathinfo($_FILES['picture-post']['name'][$i])['extension']);
             array_push($listImage, $img);
         }
+
+
+
         $wasInsertSuccessfull = $post->Insert(new Post(0, $text, $time, $time, $listImage));
+
         if ($wasInsertSuccessfull != -1) {
             //If all the image are good, this code will upload them on the "uploads" dir
             for ($i = 0; $i < count($_FILES['picture-post']['name']); $i++) {
@@ -50,6 +55,9 @@ if (isset($_POST['text-post']) && isset($_FILES['picture-post'])) {
             }
             header("Location: ../index.php");
 
+        }
+        else{
+            echo "pas upload";
         }
     } else
         echo "non";

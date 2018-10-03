@@ -227,7 +227,7 @@ include_once('scripts/class/Db.php');
             type: "POST",
             url: "scripts/post-treatment.php",
             data: {'idpost': $("#idpost-delete").val(), 'modal-delete-submit': true},
-            success: function (data) {
+            success: (data) =>  {
                 window.location.reload();
             }
         });
