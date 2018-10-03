@@ -84,7 +84,9 @@ include_once('scripts/class/Db.php');
                 </div>
                 <?php
             }
+            //salut poulpe
             ?>
+
             <form method="post" action="scripts/post-treatment.php" id="modal-form">
                 <div class="modal fade" id="modal<?= $item->getId() ?>" role="dialog">
                     <div class="modal-dialog">
