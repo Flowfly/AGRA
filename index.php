@@ -84,7 +84,6 @@ include_once('scripts/class/Db.php');
                 </div>
                 <?php
             }
-            //salut poulpe
             ?>
 
             <form method="post" action="scripts/post-treatment.php" id="modal-form">
