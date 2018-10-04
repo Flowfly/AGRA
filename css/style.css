@@ -1,5 +1,6 @@
 html, body{
     margin: 0;
+    padding: 0;
     height: 100%;
     width:100%;
     background-color: #E9EBEE;
@@ -83,4 +84,41 @@ section
 }
 textarea{
     resize: none;
+}
+
+
+
+.container {
+    position: relative;
+}
+
+.img-edit-modal{
+    opacity: 1;
+    display: block;
+    height: auto;
+    transition: .5s ease;
+    backface-visibility: hidden;
+    max-width: 100%;
+}
+
+.container:hover .img-edit-modal
+{
+    opacity: 0.3;
+    cursor: pointer;
+}
+
+.container:hover .trash-icon-container{
+    opacity: 1;
+}
+
+.trash-icon-container {
+    z-index: 0;
+    transition: .5s ease;
+    opacity: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
+    text-align: center;
 }

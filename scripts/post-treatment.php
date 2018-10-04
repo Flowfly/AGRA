@@ -140,7 +140,34 @@ if (isset($_POST['idpost']) && isset($_POST['modal-delete-submit'])) {
 
 // Code about the update treatment
 // This code is called by Ajax on the index view
-if (isset($_POST['text-post-update']) && isset($_FILES['picture-post-update'])) {
+if (isset($_POST['imageName'])) {
+    $imageName = filter_input(INPUT_POST, "imageName");
+    $controller = new PostController($db->GetPDO());
+    $wasImageDeleteFromDb = $controller->DeleteOneImage($imageName);
 
+    if($wasImageDeleteFromDb)
+    {
+        if(copy($upload_dir . "/" . $imageName, $upload_dir . "/tmp/" . $imageName))
+        {
+            $oldDir = getcwd();
+            chdir($upload_dir);
+            $wasImageDeleted = unlink($imageName);
+            chdir($oldDir);
+            if($wasImageDeleted)
+            {
+                chdir($upload_dir . "/tmp");
+                unlink($imageName);
+                chdir($oldDir);
+            }
+            else
+            {
+                copy($upload_dir . "/tmp/" . $imageName, $upload_dir . "/" . $imageName);
+            }
+        }
+    }
+    else
+    {
+        throw new Exception("Image non supprimée");
+    }
 }
 ?>

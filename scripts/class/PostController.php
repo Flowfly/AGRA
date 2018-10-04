@@ -61,6 +61,22 @@ class PostController
         }
     }
 
+    public function DeleteOneImage($name)
+    {
+        try{
+            $this->db->beginTransaction();
+            $query = $this->db->prepare("DELETE FROM image WHERE nameImage = :name");
+            $query->bindValue(":name", $name, PDO::PARAM_STR);
+            $query->execute();
+            $this->db->commit();
+            return 0;
+        }catch (Exception $exception)
+        {
+            $this->db->rollback();
+            return -1;
+        }
+    }
+
     public function Delete($id)
     {
         try{

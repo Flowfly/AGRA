@@ -21,7 +21,7 @@ include_once('scripts/class/Db.php');
 <body>
 <nav>
     <div class="row">
-        <img src="img/logo.png" id="pp">
+        <a href="#"><img src="img/logo.png" id="pp"></a>
     </div>
     <div class="row">
         <h3>Centre de Formation Professionnelle et Technique d'informatique</h3>
@@ -71,7 +71,7 @@ include_once('scripts/class/Db.php');
                     <p><span><?= $item->getText(); ?></span></p>
                 </div>
                 <div class="col-2" style="text-align: right; padding-right:3%; padding-top: 1%;">
-                    <a class="fas fa-pen" id="modify" onclick="EditPost(<?= $item->getId() ?>)"></a>
+                    <a class="fas fa-pen" id="modify" href="editPost.php?idPost=<?= $item->getId() ?>"></a>
                     <a class="fas fa-trash" id="delete" onclick="DeletePost(<?= $item->getId() ?>)"></a>
                 </div>
             </div>
@@ -105,10 +105,14 @@ include_once('scripts/class/Db.php');
                                         for ($i = 0; $i < count($item->getImages()); $i++) {
                                             ?>
                                             <div class="col-2">
-                                                <input type="checkbox" name="chbx<?=$i?>"
-                                                       value="<?= $item->getImages()[$i]->getName() ?>" checked> <img
-                                                        src="img/uploads/<?= $item->getImages()[$i]->getName() ?>"
-                                                        width="30px" height="30px">
+                                                <div class="container-edit-image">
+                                                    <div class="trash-icon-container">
+                                                        <i class="fas fa-trash" style="color: #f24646;font-size: 16px;padding: 16px 32px;"></i>
+                                                    </div>
+                                                    <img src="img/uploads/<?= $item->getImages()[$i]->getName() ?>" width="200px" class="img-edit-modal">
+
+                                                </div>
+
                                             </div>
                                             <?php
                                         }
