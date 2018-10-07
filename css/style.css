@@ -29,7 +29,7 @@ section
 
 #cover{
     width:99%;
-    height: 40%;
+    height: 45%;
     background-color: white;
     border: 1px lightgray solid;
     -webkit-border-radius: 5px;
@@ -80,7 +80,7 @@ section
 }
 
 .img-post{
-    width:75%;
+    width:15rem;
 }
 textarea{
     resize: none;

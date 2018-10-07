@@ -37,7 +37,20 @@ include_once('scripts/class/Db.php');
             <img src="img/cfpt-banner.png" alt="code">
         </div>
     </div>
+    <br>
     <?php
+    if (isset($_SESSION['error'])) {
+        ?>
+        <div class="row">
+            <div class="alert alert-danger col-12">
+                <?php
+                echo $_SESSION['error'];
+                unset($_SESSION['error']);
+                ?>
+            </div>
+        </div>
+        <?php
+    }
     if (isset($_GET['idPost'])) {
         $id = filter_input(INPUT_GET, "idPost");
         $db = new Db('Facebook', 'localhost', 'florian', '6B8X7BzRfLUFyOrF', [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
@@ -184,8 +197,10 @@ include_once('scripts/class/Db.php');
             url: "scripts/post-treatment.php",
             data: {'imageName': param},
             success: (data) => {
-                alert(data);
                 window.location.reload();
+            },
+            error: (data) => {
+                alert("Erreur de traitement, veuillez réessayer plus tard ou contacter un administrateur" + data);
             }
         });
     }

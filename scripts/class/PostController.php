@@ -45,7 +45,7 @@ class PostController
         try {
             $this->db->beginTransaction();
             $last_idpost_inserted = $this->InsertPost($post);
-            if ($last_idpost_inserted != 0) {
+            if ($last_idpost_inserted != 0 && !empty($post->getImages())) {
                 for ($i = 0; $i < count($post->getImages()); $i++) {
                     $post->getImages()[$i]->setIdPost($last_idpost_inserted);
                     $wasInsertSuccessfull = $this->InsertImage($post->getImages()[$i]);
