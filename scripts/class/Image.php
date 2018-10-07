@@ -28,10 +28,13 @@ class Image
     }
 
     //Constructors
-    public function __construct($name, $idPost = 0)
+    public function __construct($name, $idPost)
     {
         $this->setName($name);
-        $this->setIdPost(0);
+        if($idPost == 0)
+            $this->setIdPost(0);
+        else
+            $this->setIdPost($idPost);
     }
 
     //Methods

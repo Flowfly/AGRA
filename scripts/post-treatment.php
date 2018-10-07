@@ -33,7 +33,7 @@ if (isset($_POST['text-post']) && isset($_FILES['picture-post'])) {
         $listImage = array();
         $date = new DateTime();
         for ($i = 0; $i < count($_FILES['picture-post']['name']); $i++) {
-            $img = new Image(uniqid() . $date->getTimestamp() . sha1(basename($_FILES['picture-post']['name'][$i])) . "." . pathinfo($_FILES['picture-post']['name'][$i])['extension']);
+            $img = new Image(uniqid() . $date->getTimestamp() . sha1(basename($_FILES['picture-post']['name'][$i])) . "." . pathinfo($_FILES['picture-post']['name'][$i])['extension'], 0);
             array_push($listImage, $img);
         }
 
@@ -145,7 +145,7 @@ if (isset($_POST['imageName'])) {
     $controller = new PostController($db->GetPDO());
     $wasImageDeleteFromDb = $controller->DeleteOneImage($imageName);
 
-    if($wasImageDeleteFromDb)
+    if($wasImageDeleteFromDb == 0)
     {
         if(copy($upload_dir . "/" . $imageName, $upload_dir . "/tmp/" . $imageName))
         {
@@ -167,7 +167,79 @@ if (isset($_POST['imageName'])) {
     }
     else
     {
+        $controller->InsertImage($imageName);
         throw new Exception("Image non supprimée");
+    }
+}
+
+if(isset($_POST['text-post-update']) && isset($_FILES['picture-post']) && isset($_POST['id']))
+{
+    $controller = new PostController($db->GetPDO());
+    $id = filter_input(INPUT_POST, "id");
+    $post = $controller->SelectOnePost($id);
+
+    if($post == null)
+    {
+        echo "marche pas";
+    }
+    else
+    {
+        $files = $_FILES['picture-post'];
+        $text = filter_input(INPUT_POST, "text-post-update");
+        echo count($files['name']);
+        if($files['name'][0] != "")
+        {
+            $listImage = array();
+            $date = new DateTime();
+            for($i = 0; $i < count($files['name']); $i++) {
+                $img = new Image(uniqid() . $date->getTimestamp() . sha1(basename($_FILES['picture-post']['name'][$i])) . "." . pathinfo($_FILES['picture-post']['name'][$i])['extension'], $post->getId());
+                array_push($listImage, $img);
+            }
+            $wasImageInserted = true;
+            for($i = 0; $i < count($listImage); $i++)
+            {
+                $wasImageInserted = $controller->InsertImage($listImage[$i]);
+                if(!$wasImageInserted)
+                    break;
+            }
+            if($wasImageInserted)
+            {
+                for ($i = 0; $i < count($_FILES['picture-post']['name']); $i++) {
+                    $name = $listImage[$i]->getName();
+                    $tmp_name = $_FILES['picture-post']['tmp_name'][$i];
+                    $wasImageUploaded = move_uploaded_file($tmp_name, "$upload_dir/$name");
+
+                    if ($wasImageUploaded) {
+                        $image = new \Gumlet\ImageResize("$upload_dir/$name");
+                        $image->resizeToBestFit(IMAGE_WIDTH, IMAGE_HEIGHT, false);
+                        $image->save("$upload_dir/$name");
+                        $wasPostUpdated = $controller->UpdatePost($post);
+                    } else {
+                        $controller->DeleteOneImage($name);
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                echo "Image pas insérée";
+            }
+        }
+        else
+        {
+            $time = date('Y-m-d') . ' ' . date('H:i:s');
+            $post->setText($text);
+            $post->setDateLastUpdate($time);
+            echo "<br><br><br>";
+            if($controller->UpdatePost($post) == 0)
+            {
+                "modifié";
+            }
+            else
+            {
+                "marche pas";
+            }
+        }
     }
 }
 ?>

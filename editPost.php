@@ -61,7 +61,8 @@ include_once('scripts/class/Db.php');
                     <div class="row">
                         <div class="col-11" style="margin:auto;">
                             <textarea class="form-control" rows="4"
-                                      name="text-post"><?= $postToEdit->getText() ?></textarea>
+                                      name="text-post-update"><?= $postToEdit->getText() ?></textarea>
+                            <input type="hidden" name="id" value="<?=$_GET['idPost']?>">
                         </div>
                     </div>
                     <div class="row" style="padding-left: 5.5%; padding-right: 5.5%; padding-top: 1%;">
@@ -89,8 +90,8 @@ include_once('scripts/class/Db.php');
                                         <div class="modal-body">
 
                                             <div id="delete-modal-body">
-                                                <p>Voulez-vous vraiment supprimer ce post ?</p>
-                                                <h4>Cette action est irréversible</h4>
+                                                <p>Voulez-vous vraiment supprimer l'image de ce post ?</p>
+                                                <h4 style="color:#f24646;">Cette action est irréversible</h4>
                                             </div>
                                         </div>
                                         <div class="modal-footer">
@@ -183,6 +184,7 @@ include_once('scripts/class/Db.php');
             url: "scripts/post-treatment.php",
             data: {'imageName': param},
             success: (data) => {
+                alert(data);
                 window.location.reload();
             }
         });

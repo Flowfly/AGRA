@@ -31,7 +31,7 @@ class PostController
         return $lastId;
     }
 
-    private function InsertImage(Image $img)
+    public function InsertImage(Image $img)
     {
         $query_image = $this->db->prepare("INSERT INTO image (nameImage, idPost) VALUES (:nameImage, :idPost)");
         $query_image->bindValue(":nameImage", $img->getName(), PDO::PARAM_STR);
@@ -101,7 +101,7 @@ class PostController
         $idpost_list = array();
         $img_list = array();
         $post_list = array();
-        $query = $this->db->prepare("SELECT idPost FROM post");
+        $query = $this->db->prepare("SELECT idPost FROM post ORDER BY idPost DESC");
         $query->execute();
         while($result = $query->fetch(PDO::FETCH_ASSOC))
         {
@@ -147,5 +147,23 @@ class PostController
         $query->execute();
         $result = $query->fetchAll(PDO::FETCH_ASSOC);
          return empty($result) ?  null : new Post($id, $result[0]['textPost'], $result[0]['datePost'], $result[0]['dateLastUpdate'], $img_list);
+    }
+
+    public function UpdatePost(Post $post)
+    {
+        try{
+            $this->db->beginTransaction();
+            $query = $this->db->prepare("UPDATE post SET textPost = :text, dateLastUpdate = :lastUpdate WHERE idPost = :id");
+            $query->bindValue(":text", $post->getText(), PDO::PARAM_STR);
+            $query->bindValue(":lastUpdate", $post->getDateLastUpdate(), PDO::PARAM_STR);
+            $query->bindValue(":id", $post->getId(), PDO::PARAM_INT);
+            $query->execute();
+            $this->db->commit();
+            return 0;
+        }catch(Exception $exception)
+        {
+            $this->db->rollback();
+            return -1;
+        }
     }
 }
